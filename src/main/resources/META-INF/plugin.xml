@@ -1,0 +1,88 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.valtecna.IaDoc</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
+    <name>IntelliDoc AI</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://www.yourcompany.com">Valtecna</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
+    <description><![CDATA[
+        AI-powered documentation generator for multiple programming languages.<br>
+        Supports Java, Python, TypeScript, JavaScript, Kotlin, Rust, PHP, and C++.<br>
+        Features complexity analysis, intelligent code insights, and contextual documentation powered by OpenAI, Groq, or AWS Bedrock.<br>
+        Get instant, comprehensive documentation with usage examples, edge cases, and performance analysis.
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends optional="true" config-file="plugin-python.xml">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="plugin-javascript.xml">JavaScript</depends>
+    <depends optional="true" config-file="plugin-rust.xml">org.rust.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                id="com.valtecna.iadoc.settings"
+                displayName="IntelliDoc AI"
+                instance="com.valtecna.iadoc.settings.DocProConfigurable"/>
+
+        <!-- Complexity inlay hints for Java -->
+        <codeInsight.inlayProvider
+                language="JAVA"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for Kotlin -->
+        <codeInsight.inlayProvider
+                language="kotlin"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for Python -->
+        <codeInsight.inlayProvider
+                language="Python"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for TypeScript -->
+        <codeInsight.inlayProvider
+                language="TypeScript"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for JavaScript -->
+        <codeInsight.inlayProvider
+                language="JavaScript"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for Rust -->
+        <codeInsight.inlayProvider
+                language="Rust"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for PHP -->
+        <codeInsight.inlayProvider
+                language="PHP"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Complexity inlay hints for C++ -->
+        <codeInsight.inlayProvider
+                language="ObjectiveC"
+                implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+    </extensions>
+
+    <!-- Actions -->
+    <actions>
+        <!-- Action in editor context menu -->
+        <action id="com.valtecna.iadoc.ShowJavaDoc"
+                class="com.valtecna.iadoc.actions.ShowJavaDocAction"
+                text="View IntelliDoc AI"
+                description="Shows AI-generated documentation with complexity analysis in a floating popup">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>
+        </action>
+    </actions>
+</idea-plugin>
