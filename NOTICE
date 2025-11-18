@@ -1,0 +1,24 @@
+IntelliDoc Professional
+Copyright 2025 Valtecna
+
+This product includes software developed by Valtecna (https://www.valtecna.com).
+
+This software uses the following third-party libraries:
+
+1. AWS SDK for Java - Bedrock Runtime
+   - License: Apache License 2.0
+   - https://github.com/aws/aws-sdk-java-v2
+
+2. Gson (Google JSON Library)
+   - License: Apache License 2.0
+   - https://github.com/google/gson
+
+3. Jsoup HTML Parser
+   - License: MIT License
+   - https://jsoup.org/
+
+4. IntelliJ Platform SDK
+   - License: Apache License 2.0
+   - https://github.com/JetBrains/intellij-community
+
+For complete license information, see the LICENSE file.

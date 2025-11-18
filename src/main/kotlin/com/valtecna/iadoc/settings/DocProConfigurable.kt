@@ -1,7 +1,14 @@
 package com.valtecna.iadoc.settings
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiManager
 import com.intellij.ui.components.JBLabel
 import com.valtecna.iadoc.Constants
 import com.valtecna.iadoc.license.LicenseChecker
@@ -22,11 +29,7 @@ class DocProConfigurable : Configurable {
     private val openaiModelBox = JComboBox(Constants.API.OPENAI_MODELS)
     private val groqModelBox = JComboBox(Constants.API.GROQ_MODELS)
     private val bedrockModelBox = JComboBox(Constants.API.BEDROCK_MODELS)
-    private val bedrockRegionField = JTextField()  // Changed to TextField
-
-    // Bedrock-specific credential fields
-    private val bedrockAccessKeyIdField = JTextField()
-    private val bedrockSecretAccessKeyField = JPasswordField()
+    private val bedrockRegionField = JTextField()
 
     // Panels for provider-specific settings
     private val openaiSettingsPanel = JPanel()
@@ -34,20 +37,39 @@ class DocProConfigurable : Configurable {
     private val bedrockSettingsPanel = JPanel()
     private val providerSettingsContainer = JPanel(BorderLayout())
 
+    private val showComplexityHintsCheckbox = JCheckBox("Complexity hints", true)
+    private val showSecurityHintsCheckbox = JCheckBox("Security hints", true)
+    private val showPerformanceHintsCheckbox = JCheckBox("Performance hints", true)
+
     init {
         val form = JPanel()
         form.layout = BoxLayout(form, BoxLayout.Y_AXIS)
 
+        // Hints configuration section (at the top, aligned left)
+        val hintsPanel = JPanel(BorderLayout())
+        val hintsCheckboxes = JPanel()
+        hintsCheckboxes.layout = BoxLayout(hintsCheckboxes, BoxLayout.Y_AXIS)
+
+        showComplexityHintsCheckbox.alignmentX = JCheckBox.LEFT_ALIGNMENT
+        showSecurityHintsCheckbox.alignmentX = JCheckBox.LEFT_ALIGNMENT
+        showPerformanceHintsCheckbox.alignmentX = JCheckBox.LEFT_ALIGNMENT
+
+        hintsCheckboxes.add(showComplexityHintsCheckbox)
+        hintsCheckboxes.add(Box.createVerticalStrut(5))
+        hintsCheckboxes.add(showSecurityHintsCheckbox)
+        hintsCheckboxes.add(Box.createVerticalStrut(5))
+        hintsCheckboxes.add(showPerformanceHintsCheckbox)
+
+        hintsPanel.add(hintsCheckboxes, BorderLayout.WEST)
+
         val licenseRow = JPanel(BorderLayout())
-        licenseRow.add(JLabel("License Status:"), BorderLayout.WEST)
-        updateLicenseStatus()
         licenseRow.add(licenseStatusLabel, BorderLayout.CENTER)
 
         val providerRow = JPanel(BorderLayout())
         providerRow.add(JLabel("LLM Provider:"), BorderLayout.WEST)
         providerRow.add(providerBox, BorderLayout.CENTER)
 
-        // API Key row (only for OpenAI and Groq - NOT for Bedrock)
+        // API Key row (for all providers: OpenAI, Groq, and Bedrock)
         apiKeyRow.add(JLabel("API Key:"), BorderLayout.WEST)
         apiKeyRow.add(apiKeyField, BorderLayout.CENTER)
 
@@ -56,20 +78,20 @@ class DocProConfigurable : Configurable {
         setupGroqSettings()
         setupBedrockSettings()
 
-        // Add listener to show/hide provider-specific settings and API Key field
         providerBox.addItemListener { e ->
             if (e.stateChange == ItemEvent.SELECTED) {
                 updateProviderSettings()
             }
         }
 
+        form.add(hintsPanel)
+        form.add(Box.createVerticalStrut(20))
         form.add(licenseRow)
         form.add(Box.createVerticalStrut(10))
         form.add(providerRow)
         form.add(apiKeyRow)
         form.add(Box.createVerticalStrut(15))
         form.add(providerSettingsContainer)
-
         panel.add(form, BorderLayout.NORTH)
     }
 
@@ -96,14 +118,6 @@ class DocProConfigurable : Configurable {
     private fun setupBedrockSettings() {
         bedrockSettingsPanel.layout = BoxLayout(bedrockSettingsPanel, BoxLayout.Y_AXIS)
 
-        val accessKeyIdRow = JPanel(BorderLayout())
-        accessKeyIdRow.add(JLabel("AWS Access Key ID:"), BorderLayout.WEST)
-        accessKeyIdRow.add(bedrockAccessKeyIdField, BorderLayout.CENTER)
-
-        val secretAccessKeyRow = JPanel(BorderLayout())
-        secretAccessKeyRow.add(JLabel("AWS Secret Access Key:"), BorderLayout.WEST)
-        secretAccessKeyRow.add(bedrockSecretAccessKeyField, BorderLayout.CENTER)
-
         val regionRow = JPanel(BorderLayout())
         regionRow.add(JLabel("AWS Region:"), BorderLayout.WEST)
         regionRow.add(bedrockRegionField, BorderLayout.CENTER)
@@ -112,10 +126,6 @@ class DocProConfigurable : Configurable {
         modelRow.add(JLabel("Bedrock Model:"), BorderLayout.WEST)
         modelRow.add(bedrockModelBox, BorderLayout.CENTER)
 
-        bedrockSettingsPanel.add(accessKeyIdRow)
-        bedrockSettingsPanel.add(Box.createVerticalStrut(5))
-        bedrockSettingsPanel.add(secretAccessKeyRow)
-        bedrockSettingsPanel.add(Box.createVerticalStrut(5))
         bedrockSettingsPanel.add(regionRow)
         bedrockSettingsPanel.add(Box.createVerticalStrut(5))
         bedrockSettingsPanel.add(modelRow)
@@ -123,11 +133,6 @@ class DocProConfigurable : Configurable {
 
     private fun updateProviderSettings() {
         providerSettingsContainer.removeAll()
-
-        // Show/hide API Key field based on provider
-        // Bedrock uses its own Access Key ID and Secret Access Key fields
-        val isBedrock = providerBox.selectedItem == Provider.Bedrock
-        apiKeyRow.isVisible = !isBedrock
 
         when (providerBox.selectedItem as? Provider) {
             Provider.OpenAI -> providerSettingsContainer.add(openaiSettingsPanel, BorderLayout.NORTH)
@@ -140,12 +145,17 @@ class DocProConfigurable : Configurable {
     }
 
     private fun updateLicenseStatus() {
-        val isPro = LicenseChecker.isPro()
-        if (isPro) {
-            licenseStatusLabel.text = "PRO (Valid license detected)"
-            licenseStatusLabel.font = licenseStatusLabel.font.deriveFont(Font.BOLD)
-        } else {
-            licenseStatusLabel.text = "FREE (No license - Limit: 10 daily queries)"
+        when (LicenseChecker.isLicensed()) {
+            true -> {
+                licenseStatusLabel.text = "PRO (Valid license activated)"
+                licenseStatusLabel.font = licenseStatusLabel.font.deriveFont(Font.BOLD)
+            }
+            false -> {
+                licenseStatusLabel.text = "Trial - 7 days free trial available"
+            }
+            null -> {
+                licenseStatusLabel.text = "Checking license status..."
+            }
         }
     }
 
@@ -163,20 +173,48 @@ class DocProConfigurable : Configurable {
                 groqModelBox.selectedItem != s.groqModel ||
                 bedrockModelBox.selectedItem != s.bedrockModel ||
                 bedrockRegionField.text != s.bedrockRegion ||
-                bedrockAccessKeyIdField.text != s.bedrockAccessKeyId ||
-                String(bedrockSecretAccessKeyField.password) != s.bedrockSecretAccessKey
+                showComplexityHintsCheckbox.isSelected != s.showComplexityHints ||
+                showSecurityHintsCheckbox.isSelected != s.showSecurityHints ||
+                showPerformanceHintsCheckbox.isSelected != s.showPerformanceHints
     }
 
     override fun apply() {
         val s = service<DocProSettingsState>()
+        val oldShowComplexityHints = s.showComplexityHints
+        val oldShowSecurityHints = s.showSecurityHints
+        val oldShowPerformanceHints = s.showPerformanceHints
+
         s.provider = providerBox.selectedItem as Provider
         s.apiKey = apiKeyField.text
         s.openaiModel = openaiModelBox.selectedItem as String
         s.groqModel = groqModelBox.selectedItem as String
         s.bedrockModel = bedrockModelBox.selectedItem as String
         s.bedrockRegion = bedrockRegionField.text
-        s.bedrockAccessKeyId = bedrockAccessKeyIdField.text
-        s.bedrockSecretAccessKey = String(bedrockSecretAccessKeyField.password)
+        s.showComplexityHints = showComplexityHintsCheckbox.isSelected
+        s.showSecurityHints = showSecurityHintsCheckbox.isSelected
+        s.showPerformanceHints = showPerformanceHintsCheckbox.isSelected
+
+        if (oldShowComplexityHints != s.showComplexityHints ||
+            oldShowSecurityHints != s.showSecurityHints ||
+            oldShowPerformanceHints != s.showPerformanceHints) {
+            ApplicationManager.getApplication().invokeLater {
+                ProjectManager.getInstance().openProjects.forEach { project ->
+                    // Clear inlay hints by updating all editors
+                    EditorFactory.getInstance().allEditors.forEach { editor ->
+                        val document = editor.document
+                        val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document)
+                        if (psiFile != null) {
+                            // Clear existing inlays
+                            editor.inlayModel.getInlineElementsInRange(0, document.textLength).forEach { it.dispose() }
+                            editor.inlayModel.getBlockElementsInRange(0, document.textLength).forEach { it.dispose() }
+                        }
+                    }
+
+                    // Restart code analyzer to regenerate hints if enabled
+                    DaemonCodeAnalyzer.getInstance(project).restart()
+                }
+            }
+        }
     }
 
     override fun reset() {
@@ -187,12 +225,13 @@ class DocProConfigurable : Configurable {
         groqModelBox.selectedItem = s.groqModel
         bedrockModelBox.selectedItem = s.bedrockModel
         bedrockRegionField.text = s.bedrockRegion
-        bedrockAccessKeyIdField.text = s.bedrockAccessKeyId
-        bedrockSecretAccessKeyField.text = s.bedrockSecretAccessKey
+        showComplexityHintsCheckbox.isSelected = s.showComplexityHints
+        showSecurityHintsCheckbox.isSelected = s.showSecurityHints
+        showPerformanceHintsCheckbox.isSelected = s.showPerformanceHints
         updateLicenseStatus()
-        updateProviderSettings()  // Update displayed settings
+        updateProviderSettings()
     }
 
-    override fun getDisplayName(): String = "IntelliDoc AI"
+    override fun getDisplayName(): String = "IntelliDoc Professional"
 }
 

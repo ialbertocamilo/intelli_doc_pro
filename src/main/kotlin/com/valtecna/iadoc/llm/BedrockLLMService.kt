@@ -15,17 +15,15 @@ import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelRequest
  * Supports Claude 3.5 Sonnet and other Bedrock models.
  *
  * Authentication options:
- * 1. Explicit credentials: accessKeyId and secretAccessKey (recommended)
- * 2. Empty credentials: Uses default AWS credentials chain (IAM role, env vars, ~/.aws/credentials)
+ * 1. API Key via environment variable or configuration (recommended)
+ * 2. Empty API key: Uses default AWS credentials chain (IAM role, env vars, ~/.aws/credentials)
  *
- * @param accessKeyId AWS Access Key ID (optional, uses default credentials if empty)
- * @param secretAccessKey AWS Secret Access Key (optional, uses default credentials if empty)
+ * @param apiKey AWS API Key (optional, uses default credentials if empty)
  * @param model Bedrock model ID (configurable)
  * @param region AWS region (configurable)
  */
 class BedrockLLMService(
-    private val accessKeyId: String,
-    private val secretAccessKey: String,
+    private val apiKey: String,
     private val model: String = Constants.API.BEDROCK_MODEL_DEFAULT,
     private val region: String = Constants.API.BEDROCK_REGION_DEFAULT
 ) : LLMService {
@@ -54,18 +52,23 @@ class BedrockLLMService(
     }
 
     private fun createBedrockClient(): BedrockRuntimeClient {
-        return if (accessKeyId.isBlank() || secretAccessKey.isBlank()) {
-            // Use default AWS credentials chain (IAM role, env vars, ~/.aws/credentials)
+        return if (apiKey.isBlank()) {
             BedrockRuntimeClient.builder()
                 .region(Region.of(region))
                 .build()
         } else {
-            // Use explicit credentials from settings
-            val credentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey)
-            BedrockRuntimeClient.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .build()
+            val keyParts = apiKey.split(":")
+            if (keyParts.size == 2) {
+                val credentials = AwsBasicCredentials.create(keyParts[0], keyParts[1])
+                BedrockRuntimeClient.builder()
+                    .region(Region.of(region))
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .build()
+            } else {
+                BedrockRuntimeClient.builder()
+                    .region(Region.of(region))
+                    .build()
+            }
         }
     }
 
@@ -90,7 +93,7 @@ class BedrockLLMService(
     }
 
     private fun buildSystemPrompt(pro: Boolean): String {
-        return if (pro) Constants.Prompts.SYSTEM_PROMPT_PRO else Constants.Prompts.SYSTEM_PROMPT_FREE
+        return Constants.Prompts.SYSTEM_PROMPT_PRO
     }
 
     private fun buildUserPrompt(context: String): String = "Code context:\n$context"

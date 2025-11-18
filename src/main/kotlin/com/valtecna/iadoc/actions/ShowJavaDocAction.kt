@@ -21,7 +21,6 @@ import com.valtecna.iadoc.services.HTMLGenerator
 import com.valtecna.iadoc.services.ExtractorRegistry
 import com.valtecna.iadoc.services.UniversalContextBuilder
 import com.valtecna.iadoc.settings.DocProSettingsState
-import com.valtecna.iadoc.services.RequestLimiter
 import com.valtecna.iadoc.license.LicenseChecker
 import com.valtecna.iadoc.ui.CodeHighlightedDocPanel
 
@@ -44,20 +43,7 @@ class ShowJavaDocAction : AnAction(Constants.UI.POPUP_TITLE) {
         }
 
         val settings = service<DocProSettingsState>()
-        val developmentMode = true
-        val isPro = LicenseChecker.isPro() or developmentMode
-        if (!isPro) {
-            val limiter = RequestLimiter()
-            val allowed = limiter.allow()
-            if (!allowed) {
-                HintManager.getInstance().showErrorHint(
-                    editor,
-                    Constants.Messages.LIMIT_REACHED
-                )
-                return
-            }
-            limiter.record()
-        }
+        val isPro = LicenseChecker.isPro()
 
         // Use the universal context builder
         val context = UniversalContextBuilder.buildContext(info)
@@ -72,8 +58,7 @@ class ShowJavaDocAction : AnAction(Constants.UI.POPUP_TITLE) {
                 model = settings.groqModel
             )
             Provider.Bedrock -> BedrockLLMService(
-                accessKeyId = settings.bedrockAccessKeyId,
-                secretAccessKey = settings.bedrockSecretAccessKey,
+                apiKey = settings.apiKey,
                 model = settings.bedrockModel,
                 region = settings.bedrockRegion
             )
@@ -85,7 +70,7 @@ class ShowJavaDocAction : AnAction(Constants.UI.POPUP_TITLE) {
             var error: String? = null
 
             override fun run(indicator: ProgressIndicator) {
-                indicator.text = "Calling IntelliDoc AI..."
+                indicator.text = "Calling IntelliDoc Professional..."
                 try {
                     htmlDoc = HTMLGenerator(llm).generate(context, isPro)
                 } catch (e: Exception) {

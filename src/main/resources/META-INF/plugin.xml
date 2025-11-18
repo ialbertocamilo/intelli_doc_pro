@@ -5,7 +5,7 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
-    <name>IntelliDoc AI</name>
+    <name>IntelliDoc Professional</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor url="https://www.yourcompany.com">Valtecna</vendor>
@@ -19,6 +19,16 @@
         Get instant, comprehensive documentation with usage examples, edge cases, and performance analysis.
     ]]></description>
 
+    <!-- Product descriptor for Paid plugin with 7-day trial -->
+    <!-- TEMPORARILY DISABLED FOR DEVELOPMENT - Enable after JetBrains approves product code
+    <product-descriptor
+            code="PVALDOC"
+            release-date="20250118"
+            release-version="20251"
+            optional="false"
+            eap="false"/>
+    -->
+
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
@@ -30,7 +40,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
                 id="com.valtecna.iadoc.settings"
-                displayName="IntelliDoc AI"
+                displayName="IntelliDoc Professional"
                 instance="com.valtecna.iadoc.settings.DocProConfigurable"/>
 
         <!-- Complexity inlay hints for Java -->
@@ -72,6 +82,26 @@
         <codeInsight.inlayProvider
                 language="ObjectiveC"
                 implementationClass="com.valtecna.iadoc.inlays.ComplexityInlayProvider"/>
+
+        <!-- Security inlay hints for Java -->
+        <codeInsight.inlayProvider
+                language="JAVA"
+                implementationClass="com.valtecna.iadoc.inlays.SecurityInlayProvider"/>
+
+        <!-- Security inlay hints for Kotlin -->
+        <codeInsight.inlayProvider
+                language="kotlin"
+                implementationClass="com.valtecna.iadoc.inlays.SecurityInlayProvider"/>
+
+        <!-- Performance inlay hints for Java -->
+        <codeInsight.inlayProvider
+                language="JAVA"
+                implementationClass="com.valtecna.iadoc.inlays.PerformanceInlayProvider"/>
+
+        <!-- Performance inlay hints for Kotlin -->
+        <codeInsight.inlayProvider
+                language="kotlin"
+                implementationClass="com.valtecna.iadoc.inlays.PerformanceInlayProvider"/>
     </extensions>
 
     <!-- Actions -->
@@ -79,7 +109,7 @@
         <!-- Action in editor context menu -->
         <action id="com.valtecna.iadoc.ShowJavaDoc"
                 class="com.valtecna.iadoc.actions.ShowJavaDocAction"
-                text="View IntelliDoc AI"
+                text="View IntelliDoc Professional"
                 description="Shows AI-generated documentation with complexity analysis in a floating popup">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>

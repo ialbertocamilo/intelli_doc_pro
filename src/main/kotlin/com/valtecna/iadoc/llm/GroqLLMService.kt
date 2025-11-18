@@ -50,7 +50,7 @@ class GroqLLMService(
     }
 
     private fun buildSystemPrompt(pro: Boolean): String {
-        return if (pro) Constants.Prompts.SYSTEM_PROMPT_PRO else Constants.Prompts.SYSTEM_PROMPT_FREE
+        return Constants.Prompts.SYSTEM_PROMPT_PRO
     }
 
     private fun buildUserPrompt(context: String): String = "Code context:\n$context"

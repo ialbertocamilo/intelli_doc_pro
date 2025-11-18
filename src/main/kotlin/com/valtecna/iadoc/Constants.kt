@@ -45,7 +45,7 @@ object Constants {
         const val POPUP_HEIGHT = 400
         const val POPUP_MAX_WIDTH = 600
         const val POPUP_MAX_HEIGHT = 500
-        const val POPUP_TITLE = "IntelliDoc AI"
+        const val POPUP_TITLE = "IntelliDoc Professional"
     }
 
     object Style {
@@ -57,7 +57,6 @@ object Constants {
     }
 
     object Limits {
-        const val FREE_DAILY_LIMIT = 10
         const val ERROR_MESSAGE_MAX_LENGTH = 300
         const val UNICODE_HEX_LENGTH = 4
     }
@@ -67,7 +66,7 @@ object Constants {
 
 <html>
 <body>
-<h3><span class="section-title">Element type:</span> <code class="element-sig">element signature</code></h3>
+<h3><span class="section-title">Element:</span> <pre><code class="element-sig">element signature</code></pre></h3>
 <h4><span class="section-title">Description</span></h4>
 <p>Clear and concise explanation of the purpose.</p>
 <h4><span class="section-title">Suggested Doc</span></h4>
@@ -106,24 +105,10 @@ IMPORTANT:
 - In "Improvement Suggestions", always provide CODE examples in <pre> tags showing the suggested improvements.
 - When the element has a "Container class" or "Container interface" field in the context, use it to show proper usage examples with the full qualified call."""
 
-        const val SYSTEM_PROMPT_FREE = """You are a programming expert with knowledge of multiple languages. Generate brief HTML with this structure:
-
-<html>
-<body>
-<h3>Type: <code>name</code></h3>
-<h4>Description</h4>
-<p>Brief explanation of the code.</p>
-<h4>Behavior</h4>
-<p>What the code does.</p>
-</body>
-</html>
-
-Only valid HTML, no extra text."""
     }
 
     object Messages {
         const val NO_ELEMENT_FOUND = "No code element found at cursor position"
-        const val LIMIT_REACHED = "Daily limit reached (FREE version). Upgrade to PRO for unlimited usage."
         const val API_KEY_NOT_CONFIGURED = "API key not configured"
         const val EMPTY_CONTENT = "Empty content in response"
         const val NO_CONTENT_FIELD = "Response missing content field"

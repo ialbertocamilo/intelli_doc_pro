@@ -2,6 +2,7 @@ package com.valtecna.iadoc.inlays
 
 import com.intellij.codeInsight.hints.*
 import com.intellij.lang.Language
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -11,6 +12,7 @@ import com.valtecna.iadoc.Constants
 import com.valtecna.iadoc.analysis.ComplexityAnalyzer
 import com.valtecna.iadoc.analysis.ComplexityResult
 import com.valtecna.iadoc.analysis.UniversalComplexityAnalyzer
+import com.valtecna.iadoc.settings.DocProSettingsState
 import javax.swing.JPanel
 
 @Suppress("UnstableApiUsage")
@@ -34,6 +36,12 @@ class ComplexityInlayProvider : InlayHintsProvider<NoSettings> {
         settings: NoSettings,
         sink: InlayHintsSink
     ): InlayHintsCollector? {
+        // Check if complexity hints are enabled in settings
+        val settingsState = service<DocProSettingsState>()
+        if (!settingsState.showComplexityHints) {
+            return null  // Don't show hints if disabled
+        }
+
         return ComplexityCollector(editor, file.language.id)
     }
 
@@ -48,14 +56,14 @@ class ComplexityInlayProvider : InlayHintsProvider<NoSettings> {
                 try {
                     val result = javaAnalyzer.analyze(element)
                     val reason = getComplexityReason(result)
-                    val text = "Complexity: ${result.time} - $reason"
+                    val text = "⚙️ Complexity: ${result.time} - $reason"
                     val offset = element.textRange.startOffset
 
                     sink.addBlockElement(
                         offset,
                         true,
                         true,
-                        0,
+                        1,
                         factory.text(text)
                     )
                 } catch (e: Exception) {
@@ -71,36 +79,33 @@ class ComplexityInlayProvider : InlayHintsProvider<NoSettings> {
                     val functionName = getFunctionName(element)
                     val functionText = element.text
 
-                    // Analyze complexity
                     val result = universalAnalyzer.analyze(functionText, functionName)
 
-                    // Get reason (with null safety)
                     val reason = try {
                         getComplexityReason(result)
                     } catch (e: Exception) {
                         "detected"
                     }
 
-                    val text = "Complexity: ${result.time} - $reason"
+                    val text = "⚙️ Complexity: ${result.time} - $reason"
                     val offset = element.textRange.startOffset
 
                     sink.addBlockElement(
                         offset,
                         true,
                         true,
-                        0,
+                        1,
                         factory.text(text)
                     )
                 } catch (e: Exception) {
-                    // If there's an error, show a basic hint
                     try {
                         val offset = element.textRange.startOffset
                         sink.addBlockElement(
                             offset,
                             true,
                             true,
-                            0,
-                            factory.text("Complexity: O(?)")
+                            1,
+                            factory.text("⚙️ Complexity: O(?)")
                         )
                     } catch (ignored: Exception) {
                         // Really ignore this one
@@ -207,7 +212,6 @@ class ComplexityInlayProvider : InlayHintsProvider<NoSettings> {
             return when (element) {
                 is PsiNamedElement -> element.name ?: ""
                 else -> {
-                    // Try to extract name from text using regex
                     val text = element.text.take(100)  // First 100 chars
                     val namePattern = Regex("(def|function|fn|func|fun)\\s+([a-zA-Z_][a-zA-Z0-9_]*)")
                     namePattern.find(text)?.groupValues?.getOrNull(2) ?: ""

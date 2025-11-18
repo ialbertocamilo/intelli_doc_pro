@@ -6,6 +6,10 @@ package com.valtecna.iadoc.analysis
  */
 class UniversalComplexityAnalyzer {
 
+    companion object {
+        private const val MAX_LINES_TO_ANALYZE = 500
+    }
+
     fun analyze(functionText: String, functionName: String = ""): ComplexityResult {
         val metrics = analyzeText(functionText, functionName)
         val time = inferTimeComplexity(metrics)
@@ -21,7 +25,7 @@ class UniversalComplexityAnalyzer {
     }
 
     private fun analyzeText(text: String, functionName: String): ComplexityMetrics {
-        val lines = text.lines()
+        val lines = text.lines().take(MAX_LINES_TO_ANALYZE)
         var loopCount = 0
         var currentDepth = 0
         var maxDepth = 0
@@ -31,7 +35,6 @@ class UniversalComplexityAnalyzer {
         var hasSortingPattern = false
         var hasFactorialPattern = false
 
-        // Track nesting depth
         val depthStack = mutableListOf<LoopType>()
 
         for (line in lines) {
