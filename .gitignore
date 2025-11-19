@@ -46,3 +46,13 @@ bin/
 .kotlin
 build
 .idea
+
+### Security - Private Keys and Certificates ###
+private.pem
+*.pem
+*.key
+*.crt
+*.csr
+chain.crt
+certificate.pem
+request.csr

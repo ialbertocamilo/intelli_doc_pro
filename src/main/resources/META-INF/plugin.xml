@@ -8,10 +8,8 @@
     <name>IntelliDoc Professional</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor url="https://www.yourcompany.com">Valtecna</vendor>
+    <vendor email="svg.z32@gmail.com" url="https://www.valtecna.com">Valtecna</vendor>
 
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
         AI-powered documentation generator for multiple programming languages.<br>
         Supports Java, Python, TypeScript, JavaScript, Kotlin, Rust, PHP, and C++.<br>

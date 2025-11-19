@@ -8,10 +8,9 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class BedrockLLMService(
+class AnthropicLLMService(
     private val apiKey: String,
-    private val model: String = Constants.API.BEDROCK_MODEL_DEFAULT,
-    private val region: String = Constants.API.BEDROCK_REGION_DEFAULT
+    private val model: String = Constants.API.ANTHROPIC_MODEL_DEFAULT
 ) : LLMService {
 
     private val gson = Gson()
@@ -21,9 +20,10 @@ class BedrockLLMService(
         return try {
             val payload = buildPayload(buildSystemPrompt(), buildUserPrompt(context))
             val request = HttpRequest.newBuilder()
-                .uri(URI.create("https://bedrock-runtime.$region.amazonaws.com/model/$model/converse"))
+                .uri(URI.create("https://api.anthropic.com/v1/messages"))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer $apiKey")
+                .header("x-api-key", apiKey)
+                .header("anthropic-version", "2023-06-01")
                 .POST(HttpRequest.BodyPublishers.ofString(payload))
                 .build()
             val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
@@ -34,12 +34,11 @@ class BedrockLLMService(
     }
 
     private fun buildPayload(system: String, user: String): String = gson.toJson(JsonObject().apply {
-        add("system", gson.toJsonTree(listOf(mapOf("type" to "text", "text" to system))))
-        add("messages", gson.toJsonTree(listOf(mapOf("role" to "user", "content" to listOf(mapOf("type" to "text", "text" to user))))))
-        add("inferenceConfig", gson.toJsonTree(mapOf(
-            "maxTokens" to Constants.API.MAX_TOKENS,
-            "temperature" to Constants.API.TEMPERATURE
-        )))
+        addProperty("model", model)
+        addProperty("max_tokens", Constants.API.MAX_TOKENS)
+        addProperty("temperature", Constants.API.TEMPERATURE)
+        add("system", gson.toJsonTree(system))
+        add("messages", gson.toJsonTree(listOf(mapOf("role" to "user", "content" to user))))
     })
 
     private fun buildSystemPrompt(): String = Constants.Prompts.SYSTEM_PROMPT_PRO
@@ -49,9 +48,7 @@ class BedrockLLMService(
     private fun extractContent(body: String): String {
         return try {
             gson.fromJson(body, JsonObject::class.java)
-                .getAsJsonObject("output")
-                ?.getAsJsonObject("message")
-                ?.getAsJsonArray("content")
+                .getAsJsonArray("content")
                 ?.get(0)?.asJsonObject
                 ?.get("text")?.asString
                 ?.takeIf { it.isNotBlank() }
@@ -62,11 +59,11 @@ class BedrockLLMService(
     }
 
     private fun parseError(e: Exception): String = when {
-        e.message?.contains("401") == true -> "Invalid Bearer Token"
-        e.message?.contains("403") == true -> "AWS IAM lacks bedrock:InvokeModel permission"
-        e.message?.contains("404") == true -> "Model '$model' not found in '$region'"
+        e.message?.contains("401") == true -> "Invalid API Key"
+        e.message?.contains("403") == true -> "Access forbidden"
+        e.message?.contains("429") == true -> "Rate limit exceeded"
         else -> e.message ?: "Unknown error"
     }
 
-    private fun fallback(msg: String): String = "<html><body><h3>⚠️ AWS Bedrock Error</h3><p>$msg</p></body></html>"
+    private fun fallback(msg: String): String = "<html><body><h3>⚠️ Anthropic Error</h3><p>$msg</p></body></html>"
 }

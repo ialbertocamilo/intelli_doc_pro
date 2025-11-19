@@ -9,12 +9,9 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiManager
-import com.intellij.ui.components.JBLabel
 import com.valtecna.iadoc.Constants
-import com.valtecna.iadoc.license.LicenseChecker
 import com.valtecna.iadoc.llm.Provider
 import java.awt.BorderLayout
-import java.awt.Font
 import java.awt.event.ItemEvent
 import javax.swing.*
 
@@ -22,19 +19,17 @@ class DocProConfigurable : Configurable {
     private val panel = JPanel(BorderLayout())
     private val providerBox = JComboBox(Provider.values())
     private val apiKeyField = JTextField()
-    private val apiKeyRow = JPanel(BorderLayout())  // Store reference to hide/show
-    private val licenseStatusLabel = JBLabel()
+    private val apiKeyRow = JPanel(BorderLayout())
 
     // Model configuration per provider
     private val openaiModelBox = JComboBox(Constants.API.OPENAI_MODELS)
     private val groqModelBox = JComboBox(Constants.API.GROQ_MODELS)
-    private val bedrockModelBox = JComboBox(Constants.API.BEDROCK_MODELS)
-    private val bedrockRegionField = JTextField()
+    private val anthropicModelBox = JComboBox(Constants.API.ANTHROPIC_MODELS)
 
     // Panels for provider-specific settings
     private val openaiSettingsPanel = JPanel()
     private val groqSettingsPanel = JPanel()
-    private val bedrockSettingsPanel = JPanel()
+    private val anthropicSettingsPanel = JPanel()
     private val providerSettingsContainer = JPanel(BorderLayout())
 
     private val showComplexityHintsCheckbox = JCheckBox("Complexity hints", true)
@@ -62,32 +57,28 @@ class DocProConfigurable : Configurable {
 
         hintsPanel.add(hintsCheckboxes, BorderLayout.WEST)
 
-        val licenseRow = JPanel(BorderLayout())
-        licenseRow.add(licenseStatusLabel, BorderLayout.CENTER)
-
         val providerRow = JPanel(BorderLayout())
         providerRow.add(JLabel("LLM Provider:"), BorderLayout.WEST)
         providerRow.add(providerBox, BorderLayout.CENTER)
 
-        // API Key row (for all providers: OpenAI, Groq, and Bedrock)
+        // API Key row (for all providers)
         apiKeyRow.add(JLabel("API Key:"), BorderLayout.WEST)
         apiKeyRow.add(apiKeyField, BorderLayout.CENTER)
 
         // Setup provider-specific panels
         setupOpenAISettings()
         setupGroqSettings()
-        setupBedrockSettings()
+        setupAnthropicSettings()
 
         providerBox.addItemListener { e ->
             if (e.stateChange == ItemEvent.SELECTED) {
                 updateProviderSettings()
+                loadApiKeyForProvider()
             }
         }
 
         form.add(hintsPanel)
         form.add(Box.createVerticalStrut(20))
-        form.add(licenseRow)
-        form.add(Box.createVerticalStrut(10))
         form.add(providerRow)
         form.add(apiKeyRow)
         form.add(Box.createVerticalStrut(15))
@@ -115,20 +106,24 @@ class DocProConfigurable : Configurable {
         groqSettingsPanel.add(modelRow)
     }
 
-    private fun setupBedrockSettings() {
-        bedrockSettingsPanel.layout = BoxLayout(bedrockSettingsPanel, BoxLayout.Y_AXIS)
-
-        val regionRow = JPanel(BorderLayout())
-        regionRow.add(JLabel("AWS Region:"), BorderLayout.WEST)
-        regionRow.add(bedrockRegionField, BorderLayout.CENTER)
+    private fun setupAnthropicSettings() {
+        anthropicSettingsPanel.layout = BoxLayout(anthropicSettingsPanel, BoxLayout.Y_AXIS)
 
         val modelRow = JPanel(BorderLayout())
-        modelRow.add(JLabel("Bedrock Model:"), BorderLayout.WEST)
-        modelRow.add(bedrockModelBox, BorderLayout.CENTER)
+        modelRow.add(JLabel("Anthropic Model:"), BorderLayout.WEST)
+        modelRow.add(anthropicModelBox, BorderLayout.CENTER)
 
-        bedrockSettingsPanel.add(regionRow)
-        bedrockSettingsPanel.add(Box.createVerticalStrut(5))
-        bedrockSettingsPanel.add(modelRow)
+        anthropicSettingsPanel.add(modelRow)
+    }
+
+    private fun loadApiKeyForProvider() {
+        val s = service<DocProSettingsState>()
+        apiKeyField.text = when (providerBox.selectedItem as? Provider) {
+            Provider.OpenAI -> s.openaiApiKey
+            Provider.Groq -> s.groqApiKey
+            Provider.Anthropic -> s.anthropicApiKey
+            else -> ""
+        }
     }
 
     private fun updateProviderSettings() {
@@ -137,42 +132,31 @@ class DocProConfigurable : Configurable {
         when (providerBox.selectedItem as? Provider) {
             Provider.OpenAI -> providerSettingsContainer.add(openaiSettingsPanel, BorderLayout.NORTH)
             Provider.Groq -> providerSettingsContainer.add(groqSettingsPanel, BorderLayout.NORTH)
-            Provider.Bedrock -> providerSettingsContainer.add(bedrockSettingsPanel, BorderLayout.NORTH)
+            Provider.Anthropic -> providerSettingsContainer.add(anthropicSettingsPanel, BorderLayout.NORTH)
             else -> {}
         }
         providerSettingsContainer.revalidate()
         providerSettingsContainer.repaint()
     }
 
-    private fun updateLicenseStatus() {
-        when (LicenseChecker.isLicensed()) {
-            true -> {
-                licenseStatusLabel.text = "PRO (Valid license activated)"
-                licenseStatusLabel.font = licenseStatusLabel.font.deriveFont(Font.BOLD)
-            }
-            false -> {
-                licenseStatusLabel.text = "Trial - 7 days free trial available"
-            }
-            null -> {
-                licenseStatusLabel.text = "Checking license status..."
-            }
-        }
-    }
-
     override fun createComponent(): JComponent {
-        updateLicenseStatus()
-        updateProviderSettings()  // Show initial provider settings
+        updateProviderSettings()
         return panel
     }
 
     override fun isModified(): Boolean {
         val s = service<DocProSettingsState>()
+        val currentApiKey = when (providerBox.selectedItem as? Provider) {
+            Provider.OpenAI -> s.openaiApiKey
+            Provider.Groq -> s.groqApiKey
+            Provider.Anthropic -> s.anthropicApiKey
+            else -> ""
+        }
         return providerBox.selectedItem != s.provider ||
-                apiKeyField.text != s.apiKey ||
+                apiKeyField.text != currentApiKey ||
                 openaiModelBox.selectedItem != s.openaiModel ||
                 groqModelBox.selectedItem != s.groqModel ||
-                bedrockModelBox.selectedItem != s.bedrockModel ||
-                bedrockRegionField.text != s.bedrockRegion ||
+                anthropicModelBox.selectedItem != s.anthropicModel ||
                 showComplexityHintsCheckbox.isSelected != s.showComplexityHints ||
                 showSecurityHintsCheckbox.isSelected != s.showSecurityHints ||
                 showPerformanceHintsCheckbox.isSelected != s.showPerformanceHints
@@ -185,11 +169,17 @@ class DocProConfigurable : Configurable {
         val oldShowPerformanceHints = s.showPerformanceHints
 
         s.provider = providerBox.selectedItem as Provider
-        s.apiKey = apiKeyField.text
+
+        when (providerBox.selectedItem as? Provider) {
+            Provider.OpenAI -> s.openaiApiKey = apiKeyField.text
+            Provider.Groq -> s.groqApiKey = apiKeyField.text
+            Provider.Anthropic -> s.anthropicApiKey = apiKeyField.text
+            else -> {}
+        }
+
         s.openaiModel = openaiModelBox.selectedItem as String
         s.groqModel = groqModelBox.selectedItem as String
-        s.bedrockModel = bedrockModelBox.selectedItem as String
-        s.bedrockRegion = bedrockRegionField.text
+        s.anthropicModel = anthropicModelBox.selectedItem as String
         s.showComplexityHints = showComplexityHintsCheckbox.isSelected
         s.showSecurityHints = showSecurityHintsCheckbox.isSelected
         s.showPerformanceHints = showPerformanceHintsCheckbox.isSelected
@@ -220,15 +210,13 @@ class DocProConfigurable : Configurable {
     override fun reset() {
         val s = service<DocProSettingsState>()
         providerBox.selectedItem = s.provider
-        apiKeyField.text = s.apiKey
+        loadApiKeyForProvider()
         openaiModelBox.selectedItem = s.openaiModel
         groqModelBox.selectedItem = s.groqModel
-        bedrockModelBox.selectedItem = s.bedrockModel
-        bedrockRegionField.text = s.bedrockRegion
+        anthropicModelBox.selectedItem = s.anthropicModel
         showComplexityHintsCheckbox.isSelected = s.showComplexityHints
         showSecurityHintsCheckbox.isSelected = s.showSecurityHints
         showPerformanceHintsCheckbox.isSelected = s.showPerformanceHints
-        updateLicenseStatus()
         updateProviderSettings()
     }
 

@@ -26,6 +26,15 @@ object Constants {
         )
         const val GROQ_MODEL_DEFAULT = "llama-3.3-70b-versatile"
 
+        // Anthropic Models
+        val ANTHROPIC_MODELS = arrayOf(
+            "claude-3-7-sonnet-20250219",
+            "claude-3-5-sonnet-20241022",
+            "claude-3-5-haiku-20241022",
+            "claude-3-opus-20240229"
+        )
+        const val ANTHROPIC_MODEL_DEFAULT = "claude-3-5-sonnet-20241022"
+
         // AWS Bedrock Models
         val BEDROCK_MODELS = arrayOf(
             "anthropic.claude-3-5-sonnet-20241022-v2:0",

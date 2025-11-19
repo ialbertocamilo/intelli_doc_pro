@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.valtecna"
-version = "1.0-SNAPSHOT"
+version = "1.0-nightly"
 
 repositories {
     mavenCentral()
@@ -21,7 +21,6 @@ dependencies {
         create("IC", "2025.1.4.1")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
 
-        // Bundled plugins
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
     }
@@ -31,13 +30,10 @@ dependencies {
     implementation("software.amazon.awssdk:auth:2.29.41")
     implementation("software.amazon.awssdk:regions:2.29.41")
 
-    // JSON processing for Bedrock requests/responses
     implementation("com.google.code.gson:gson:2.10.1")
 
-    // HTML parsing for syntax highlighting
     implementation("org.jsoup:jsoup:1.17.2")
 
-    // Testing dependencies
     testImplementation("junit:junit:4.13.2")
 }
 
@@ -50,6 +46,12 @@ intellijPlatform {
         changeNotes = """
             Initial version
         """.trimIndent()
+    }
+
+    signing {
+        certificateChain.set(file("chain.crt").readText())
+        privateKey.set(file("private.pem").readText())
+        password.set(System.getenv("PRIVATE_KEY_PASSWORD") ?: "")
     }
 }
 

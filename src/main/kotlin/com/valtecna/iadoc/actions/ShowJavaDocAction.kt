@@ -16,7 +16,7 @@ import com.valtecna.iadoc.Constants
 import com.valtecna.iadoc.llm.Provider
 import com.valtecna.iadoc.llm.OpenAILLMService
 import com.valtecna.iadoc.llm.GroqLLMService
-import com.valtecna.iadoc.llm.BedrockLLMService
+import com.valtecna.iadoc.llm.AnthropicLLMService
 import com.valtecna.iadoc.services.HTMLGenerator
 import com.valtecna.iadoc.services.ExtractorRegistry
 import com.valtecna.iadoc.services.UniversalContextBuilder
@@ -50,17 +50,16 @@ class ShowJavaDocAction : AnAction(Constants.UI.POPUP_TITLE) {
 
         val llm = when (settings.provider) {
             Provider.OpenAI -> OpenAILLMService(
-                apiKey = settings.apiKey,
+                apiKey = settings.openaiApiKey,
                 model = settings.openaiModel
             )
             Provider.Groq -> GroqLLMService(
-                apiKey = settings.apiKey,
+                apiKey = settings.groqApiKey,
                 model = settings.groqModel
             )
-            Provider.Bedrock -> BedrockLLMService(
-                apiKey = settings.apiKey,
-                model = settings.bedrockModel,
-                region = settings.bedrockRegion
+            Provider.Anthropic -> AnthropicLLMService(
+                apiKey = settings.anthropicApiKey,
+                model = settings.anthropicModel
             )
         }
 

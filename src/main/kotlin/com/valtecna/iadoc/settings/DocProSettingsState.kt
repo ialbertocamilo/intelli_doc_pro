@@ -8,12 +8,17 @@ import com.valtecna.iadoc.llm.Provider
 @State(name = "DocProSettings", storages = [Storage("DocProSettings.xml")])
 @Service(Service.Level.APP)
 class DocProSettingsState : PersistentStateComponent<DocProSettingsState> {
-    var provider: Provider = Provider.OpenAI
-    var apiKey: String = ""
+    var provider: Provider = Provider.Anthropic
+
+    // API Keys per provider
+    var openaiApiKey: String = ""
+    var groqApiKey: String = ""
+    var anthropicApiKey: String = ""
 
     // Model configuration per provider
     var openaiModel: String = Constants.API.OPENAI_MODEL_DEFAULT
     var groqModel: String = Constants.API.GROQ_MODEL_DEFAULT
+    var anthropicModel: String = Constants.API.ANTHROPIC_MODEL_DEFAULT
     var bedrockModel: String = Constants.API.BEDROCK_MODEL_DEFAULT
     var bedrockRegion: String = Constants.API.BEDROCK_REGION_DEFAULT
 

@@ -5,5 +5,5 @@ interface LLMService {
 }
 
 enum class Provider {
-    OpenAI, Groq, Bedrock
+    OpenAI, Groq, Anthropic
 }
