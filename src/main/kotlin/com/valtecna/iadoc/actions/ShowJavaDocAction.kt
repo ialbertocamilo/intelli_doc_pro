@@ -69,7 +69,7 @@ class ShowJavaDocAction : AnAction(Constants.UI.POPUP_TITLE) {
             var error: String? = null
 
             override fun run(indicator: ProgressIndicator) {
-                indicator.text = "Calling IntelliDoc Professional..."
+                indicator.text = "Calling CodeHint Professional..."
                 try {
                     htmlDoc = HTMLGenerator(llm).generate(context, isPro)
                 } catch (e: Exception) {

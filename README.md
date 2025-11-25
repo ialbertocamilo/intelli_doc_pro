@@ -1,10 +1,10 @@
-# IntelliDoc Professional
+# CodeHint Professional
 
 **AI-powered code documentation and analysis for IntelliJ IDEA**
 
 [![JetBrains Marketplace](https://img.shields.io/badge/JetBrains-Marketplace-blue.svg)](https://plugins.jetbrains.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.0-green.svg)](https://github.com/valtecna/intellidoc-professional)
+[![Version](https://img.shields.io/badge/Version-1.0-green.svg)](https://github.com/valtecna/codehint-professional)
 
 ---
 
@@ -53,14 +53,14 @@ Java • Kotlin • Python • TypeScript • JavaScript • Rust • PHP • C+
 ### From JetBrains Marketplace (Recommended)
 
 1. Open **Settings/Preferences** → **Plugins**
-2. Search for **"IntelliDoc Professional"**
+2. Search for **"CodeHint Professional"**
 3. Click **Install**
 4. Restart IDE
-5. Configure your LLM provider in **Settings → Tools → IntelliDoc Professional**
+5. Configure your LLM provider in **Settings → Tools → CodeHint Professional**
 
 ### Manual Installation
 
-1. Download the latest release from [Releases](https://github.com/valtecna/intellidoc-professional/releases)
+1. Download the latest release from [Releases](https://github.com/valtecna/codehint-professional/releases)
 2. Open **Settings/Preferences** → **Plugins** → ⚙️ → **Install Plugin from Disk**
 3. Select the downloaded `.zip` file
 4. Restart IDE
@@ -70,7 +70,7 @@ Java • Kotlin • Python • TypeScript • JavaScript • Rust • PHP • C+
 ## ⚙️ Configuration
 
 ### 1. Open Settings
-**Settings/Preferences → Tools → IntelliDoc Professional**
+**Settings/Preferences → Tools → CodeHint Professional**
 
 ### 2. Choose LLM Provider
 
@@ -104,7 +104,7 @@ Toggle real-time code analysis features:
 
 **Method 1: Context Menu**
 1. Place cursor on any function/class/method
-2. Right-click → **"View IntelliDoc Professional"**
+2. Right-click → **"View CodeHint Professional"**
 3. Documentation appears in popup
 
 **Method 2: Keyboard Shortcut**
@@ -167,12 +167,12 @@ public List<Order> getUserOrders(List<User> users) {
 ### Build from Source
 
 ```bash
-git clone https://github.com/valtecna/intellidoc-professional.git
-cd intellidoc-professional
+git clone https://github.com/valtecna/codehint-professional.git
+cd codehint-professional
 ./gradlew buildPlugin
 ```
 
-Build output: `build/distributions/IntelliDoc-*.zip`
+Build output: `build/distributions/CodeHint-*.zip`
 
 ### Run in Development Mode
 
@@ -205,7 +205,7 @@ See [NOTICE](NOTICE) for complete attribution.
 ## 🤝 Support
 
 - **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/valtecna/intellidoc-professional/issues)
+- **Issues**: [GitHub Issues](https://github.com/valtecna/codehint-professional/issues)
 - **Email**: svg.z32@gmail.com
 - **Location**: Arequipa, Peru
 - **Marketplace**: [JetBrains Plugin Page](https://plugins.jetbrains.com/)
@@ -295,9 +295,9 @@ See [ADDITIONAL_HINTS_ROADMAP.md](ADDITIONAL_HINTS_ROADMAP.md) for upcoming feat
 
 ---
 
-## 🌟 Why IntelliDoc Professional?
+## 🌟 Why CodeHint Professional?
 
-| Feature | IntelliDoc Pro | Traditional Docs | IDE Built-in |
+| Feature | CodeHint Pro | Traditional Docs | IDE Built-in |
 |---------|---------------|------------------|--------------|
 | AI-Generated Docs | ✅ | ❌ | ❌ |
 | Real-time Hints | ✅ | ❌ | 🟡 Limited |
@@ -315,7 +315,7 @@ See [ADDITIONAL_HINTS_ROADMAP.md](ADDITIONAL_HINTS_ROADMAP.md) for upcoming feat
 Website: https://www.valtecna.com
 Email: svg.z32@gmail.com
 Location: Arequipa, Peru
-GitHub: https://github.com/valtecna/intellidoc-professional
+GitHub: https://github.com/valtecna/codehint-professional
 
 ---
 

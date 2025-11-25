@@ -1,4 +1,4 @@
-# IntelliDoc Professional - Hints Examples
+# CodeHint Professional - Hints Examples
 
 ## Complexity Hints Examples
 
@@ -320,6 +320,6 @@ class ProcessManager {
 
 ### Configuration:
 Both hint types can be enabled/disabled from:
-**Settings → Tools → IntelliDoc Professional**
+**Settings → Tools → CodeHint Professional**
 - ☑️ Activate/Deactivate complexity hints
 - ☑️ Activate/Deactivate security hints

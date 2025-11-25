@@ -1,8 +1,8 @@
-# IntelliDoc Professional - Additional Hints Roadmap
+# CodeHint Professional - Additional Hints Roadmap
 
 ## 🎯 Recommended Additional Hints Implementation
 
-This document outlines potential hint types that could be added to IntelliDoc Professional to increase its value and differentiation in the market.
+This document outlines potential hint types that could be added to CodeHint Professional to increase its value and differentiation in the market.
 
 ---
 
@@ -542,7 +542,7 @@ class DocumentationHints : HintAnalyzer {
 
 ### **Current Implementation Status** (Phase 1 Complete):
 
-IntelliDoc Professional now offers:
+CodeHint Professional now offers:
 
 ### **Unique Value Proposition**:
 1. ✅ **Complexity Analysis** - 8 complexity patterns across 9 languages
@@ -557,10 +557,10 @@ IntelliDoc Professional now offers:
 - **Tabnine**: Code completion + chat ($12/month) - No security/performance hints
 - **JetBrains AI**: IDE-specific features (~$100/year) - Limited code analysis
 - **SonarLint**: Static analysis (Free) - No AI documentation, limited hint types
-- **IntelliDoc Professional**: **3 specialized hint types + AI docs** (Trial → $8-12/month)
+- **CodeHint Professional**: **3 specialized hint types + AI docs** (Trial → $8-12/month)
 
 ### **Competitive Advantages**:
-| Feature | IntelliDoc Professional | GitHub Copilot | Tabnine | JetBrains AI | SonarLint |
+| Feature | CodeHint Professional | GitHub Copilot | Tabnine | JetBrains AI | SonarLint |
 |---------|---------------|----------------|---------|--------------|-----------|
 | Complexity Hints | ✅ 8 types | ❌ | ❌ | ❌ | ⚠️ Basic |
 | Security Hints | ✅ 6 types | ❌ | ❌ | ❌ | ✅ Yes |

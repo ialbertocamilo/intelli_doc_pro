@@ -54,7 +54,7 @@ object Constants {
         const val POPUP_HEIGHT = 400
         const val POPUP_MAX_WIDTH = 600
         const val POPUP_MAX_HEIGHT = 500
-        const val POPUP_TITLE = "IntelliDoc Professional"
+        const val POPUP_TITLE = "CodeHint Professional"
     }
 
     object Style {

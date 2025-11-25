@@ -1,13 +1,9 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.valtecna.IaDoc</id>
 
-    <!-- Public plugin name should be written in Title Case.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
-    <name>IntelliDoc Professional</name>
+    <name>CodeHint Professional</name>
 
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="svg.z32@gmail.com" url="https://www.valtecna.com">Valtecna</vendor>
 
     <description><![CDATA[
@@ -17,15 +13,6 @@
         Get instant, comprehensive documentation with usage examples, edge cases, and performance analysis.
     ]]></description>
 
-    <!-- Product descriptor for Paid plugin with 7-day trial -->
-    <!-- TEMPORARILY DISABLED FOR DEVELOPMENT - Enable after JetBrains approves product code
-    <product-descriptor
-            code="PVALDOC"
-            release-date="20250118"
-            release-version="20251"
-            optional="false"
-            eap="false"/>
-    -->
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
@@ -38,7 +25,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
                 id="com.valtecna.iadoc.settings"
-                displayName="IntelliDoc Professional"
+                displayName="CodeHint Professional"
                 instance="com.valtecna.iadoc.settings.DocProConfigurable"/>
 
         <!-- Complexity inlay hints for Java -->
@@ -107,7 +94,7 @@
         <!-- Action in editor context menu -->
         <action id="com.valtecna.iadoc.ShowJavaDoc"
                 class="com.valtecna.iadoc.actions.ShowJavaDocAction"
-                text="View IntelliDoc Professional"
+                text="View CodeHint Professional"
                 description="Shows AI-generated documentation with complexity analysis in a floating popup">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>

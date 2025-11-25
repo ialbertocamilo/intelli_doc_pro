@@ -220,6 +220,6 @@ class DocProConfigurable : Configurable {
         updateProviderSettings()
     }
 
-    override fun getDisplayName(): String = "IntelliDoc Professional"
+    override fun getDisplayName(): String = "CodeHint Professional"
 }
 
