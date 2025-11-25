@@ -7,10 +7,10 @@
     <vendor email="svg.z32@gmail.com" url="https://www.valtecna.com">Valtecna</vendor>
 
     <description><![CDATA[
-        AI-powered documentation generator for multiple programming languages.<br>
-        Supports Java, Python, TypeScript, JavaScript, Kotlin, Rust, PHP, and C++.<br>
-        Features complexity analysis, intelligent code insights, and contextual documentation powered by OpenAI, Groq, or AWS Bedrock.<br>
-        Get instant, comprehensive documentation with usage examples, edge cases, and performance analysis.
+        AI-assisted documentation generator for Java, Kotlin, Python, TypeScript, JavaScript, and Rust.<br>
+        Includes complexity inlays in the editor; also available for PHP and C/C++ via generic analysis.<br>
+        Supports OpenAI, Groq, and Anthropic providers with per-provider model and API key configuration.<br>
+        Documentation includes usage examples, edge cases, and improvement suggestions; security and performance inlays are available for Java and Kotlin.
     ]]></description>
 
 
