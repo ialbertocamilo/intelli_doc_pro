@@ -1,1 +1,1 @@
-rootProject.name = "IaDoc"
+rootProject.name = "CodeHint Professional"
